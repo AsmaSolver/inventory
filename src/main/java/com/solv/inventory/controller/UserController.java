@@ -1,14 +1,12 @@
 package com.solv.inventory.controller;
-
+import com.solv.inventory.entity.User;
 import com.solv.inventory.service.UserServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 
 @Api(value = "Services for user")
 @RestController
@@ -17,10 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
     @Autowired
     private UserServiceImpl userServiceImpl;
-
     @ApiOperation("- register new user")
-    @PostMapping("/")
-    public String newUser(@RequestBody String userName) {
-        return userServiceImpl.saveUser(userName);
+    @PostMapping(value = "/",produces = {MediaType.APPLICATION_JSON_VALUE})
+    public User newUser(@RequestBody User user) {
+        return this.userServiceImpl.createUser(user);
     }
 }
