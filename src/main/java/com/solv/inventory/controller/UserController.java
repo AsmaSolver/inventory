@@ -1,5 +1,6 @@
 package com.solv.inventory.controller;
 
+import com.solv.inventory.entity.User;
 import com.solv.inventory.service.UserServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -23,4 +24,11 @@ public class UserController {
     public String newUser(@RequestBody String userName) {
         return userServiceImpl.saveUser(userName);
     }
+
+    @PostMapping("/branch")
+    public User newBranch(@RequestBody User newBranch)
+    {
+        return userServiceImpl.saveBranch(newBranch);
+    }
+
 }

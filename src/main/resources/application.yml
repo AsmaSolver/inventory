@@ -13,3 +13,12 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher #to resolve error related to swagger
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/inventory
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 1234567890
+    dialect: org.hibernate.dialect.MySQL8Dialect
+  jpa:
+    hibernate.ddl-auto: update
