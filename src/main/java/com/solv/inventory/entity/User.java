@@ -1,17 +1,19 @@
 package com.solv.inventory.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import javax.persistence.*;
 
 @Entity
 @Table(name = "txn_user")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class User extends Audit{
+
     @Id
     @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,16 +26,5 @@ public class User {
     private String mobNum;
     @Column(name = "user_type")
     private String userType;
-    @Column(name = "created_date")
-    private java.sql.Timestamp createdDate;
-
-    @Column(name = "created_by")
-    private String createdBy;
-
-    @Column(name = "updated_date")
-    private java.sql.Timestamp updatedDate;
-
-    @Column(name = "updated_by")
-    private String updatedBy;
 
 }
