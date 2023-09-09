@@ -67,14 +67,16 @@ public class UserServiceImpl implements UserService {
         if(!userRepository.findById(id).isPresent()){
             throw new UserNotFoundException("User with id "+id+" does not exists");
         }
-        User user=userRepository.findById(id).get();
-         return toUserDto(user);
+        else {
+            User user = userRepository.findById(id).get();
+            return toUserDto(user);
+        }
     }
     @Override
     public List<RegisterUserDto> getAll() throws UserNotFoundException {
         List<User> userList=this.userRepository.findAll();
         if(userList.isEmpty()){
-            throw new UserNotFoundException("Currently there are no user registered");
+            throw new UserNotFoundException("Currently there are no users registered");
         }
         else {
             return toUserDtoList(userList);
@@ -83,8 +85,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Response updateById(RegisterUserDto registerUserDto,int id) {
-        boolean isValid=isValidUser(registerUserDto);
-        if(!isValid){
+        if(!isValidUser(registerUserDto)){
             return buildResponse(HttpStatus.BAD_REQUEST.toString(), "Invalid Fields");
         }
         else{
