@@ -21,4 +21,7 @@ public class Item {
     private String name;
     @Column(name = "price")
     private double price;
+    @Column(name = "category")
+    private String category;
+
 }

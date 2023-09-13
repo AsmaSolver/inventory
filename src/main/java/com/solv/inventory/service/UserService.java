@@ -1,23 +1,21 @@
 package com.solv.inventory.service;
 
 import com.solv.inventory.dto.RegisterUserDto;
-import com.solv.inventory.dto.Response;
-import com.solv.inventory.exceptions.BadArgumentException;
-import com.solv.inventory.exceptions.UserNotFoundException;
-import java.util.List;
+import com.solv.inventory.dto.UserResponse;
+import org.springframework.http.ResponseEntity;
 
 public interface UserService {
      String saveUser(String name);
-     Response createNewUser(RegisterUserDto registerUserDto) throws BadArgumentException;
+     ResponseEntity<UserResponse> createNewUser(RegisterUserDto registerUserDto);
 
-     RegisterUserDto getById(int id) throws UserNotFoundException;
+     ResponseEntity<UserResponse> getById(int id);
 
-     List<RegisterUserDto> getAll() throws UserNotFoundException;
+     ResponseEntity<UserResponse>getAll();
 
-     Response updateById(RegisterUserDto registerUserDto,int id);
+     ResponseEntity<UserResponse> updateById(RegisterUserDto registerUserDto, int id);
 
-     Response deleteAll() throws UserNotFoundException;
+     ResponseEntity<UserResponse> deleteAll();
 
-     Response deleteUserById(int id);
+     ResponseEntity<UserResponse> deleteUserById(int id);
 
 }

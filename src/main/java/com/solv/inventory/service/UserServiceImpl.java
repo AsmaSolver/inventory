@@ -1,13 +1,12 @@
 package com.solv.inventory.service;
 
-import com.solv.inventory.dto.Response;
+import com.solv.inventory.dto.UserResponse;
 import com.solv.inventory.exceptions.BadArgumentException;
-import com.solv.inventory.exceptions.UserNotFoundException;
 import com.solv.inventory.dao.UserRepository;
 import com.solv.inventory.dto.RegisterUserDto;
 import com.solv.inventory.entity.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
@@ -22,8 +21,12 @@ import static com.solv.inventory.util.UserTypeValidator.isValidUserType;
 @Service
 public class UserServiceImpl implements UserService {
 
-    @Autowired
+//    @Autowired
     UserRepository userRepository;
+
+    public UserServiceImpl(UserRepository userRepository) {
+        this.userRepository=userRepository;
+    }
 
     @Override
     public String saveUser(String userName) {
@@ -31,70 +34,80 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Response createNewUser(RegisterUserDto registerUserDto) {
+    public ResponseEntity<UserResponse> createNewUser(RegisterUserDto registerUserDto) {
        if(!isValidUser(registerUserDto)) {
-           return buildResponse(HttpStatus.BAD_REQUEST.toString(), "Give proper Inputs");
+           UserResponse userResponse =buildResponse1(null,HttpStatus.BAD_REQUEST.toString(),"Invalid Inputs");
+           return new ResponseEntity<>(userResponse,HttpStatus.BAD_REQUEST);
        }
         else{
             User user = toUser(registerUserDto);
             user.setCreatedDate(LocalDate.now());
             user.setUpdatedDate(LocalDate.now());
             user = userRepository.save(user);
-            return buildResponse(HttpStatus.CREATED.toString(), "Successfully Created User");
+           UserResponse userResponse =buildResponse1(user,HttpStatus.CREATED.toString(), "User registered successfully");
+           return new ResponseEntity<>(userResponse,HttpStatus.BAD_REQUEST);
        }
     }
-    private Response buildResponse(String statusCode,String message){
-        return Response.builder()
+    private UserResponse buildResponse1(Object object, String statusCode, String message){
+        return UserResponse.builder()
+                .data(object)
                 .statusCode(statusCode)
                 .statusMessage(message)
                 .build();
     }
     private boolean isValidUser(RegisterUserDto registerUserDto)  {
-        try {
+        try{
             isValidName(registerUserDto.getName());
             isValidMobileNumber(registerUserDto.getMobNum());
             isValidEmail(registerUserDto.getEmail());
             isValidUserType(registerUserDto.getUserType());
             return true;
         }
-        catch(BadArgumentException exception){
+        catch(BadArgumentException ignored){
 
         }
         return false;
     }
     @Override
-    public RegisterUserDto getById(int id) throws UserNotFoundException {
-        if(!userRepository.findById(id).isPresent()){
-            throw new UserNotFoundException("User with id "+id+" does not exists");
+    public ResponseEntity<UserResponse> getById(int id) {
+        if(!userRepository.findById(id).isPresent()) {
+            UserResponse userResponse = buildResponse1(null, HttpStatus.BAD_REQUEST.toString(), "User with id " + id + " does not exists");
+            return new ResponseEntity<>(userResponse,HttpStatus.BAD_REQUEST);
         }
         else {
             User user = userRepository.findById(id).get();
-            return toUserDto(user);
+            UserResponse userResponse = buildResponse1(user, HttpStatus.OK.toString(), "User with given id exists");
+            return new ResponseEntity<>(userResponse,HttpStatus.OK);
         }
     }
     @Override
-    public List<RegisterUserDto> getAll() throws UserNotFoundException {
+    public ResponseEntity<UserResponse>getAll()  {
         List<User> userList=this.userRepository.findAll();
-        if(userList.isEmpty()){
-            throw new UserNotFoundException("Currently there are no users registered");
+        if(userList.isEmpty()) {
+            UserResponse userResponse = buildResponse1(null, HttpStatus.OK.toString(), "Currently there are no registered users");
+            return new ResponseEntity<>(userResponse,HttpStatus.OK);
         }
         else {
-            return toUserDtoList(userList);
+            List<RegisterUserDto> list=toUserDtoList(userList);
+            UserResponse userResponse =buildResponse1(list,HttpStatus.OK.toString(), "Currently there are no registered users");
+            return new ResponseEntity<>(userResponse,HttpStatus.OK);
         }
     }
 
     @Override
-    public Response updateById(RegisterUserDto registerUserDto,int id) {
+    public ResponseEntity<UserResponse> updateById(RegisterUserDto registerUserDto, int id) {
         if(!isValidUser(registerUserDto)){
-            return buildResponse(HttpStatus.BAD_REQUEST.toString(), "Invalid Fields");
+            UserResponse userResponse = buildResponse1(null,HttpStatus.BAD_REQUEST.toString(), "Invalid Fields");
+            return new ResponseEntity<>(userResponse,HttpStatus.BAD_REQUEST);
         }
         else{
             if(!userRepository.findById(id).isPresent()){
                 User user=toUser(registerUserDto);
                 user.setCreatedDate(LocalDate.now());
                 user.setUpdatedDate(LocalDate.now());
-                User response= this.userRepository.save(user);
-                return buildResponse(HttpStatus.OK.toString(), "User Created");
+                User updatedUser= this.userRepository.save(user);
+                UserResponse userResponse = buildResponse1(updatedUser,HttpStatus.OK.toString(), "User Created");
+                return new ResponseEntity<>(userResponse,HttpStatus.CREATED);
 
             }
             else {
@@ -113,32 +126,34 @@ public class UserServiceImpl implements UserService {
                     userDB.setUserType(user.getUserType());
                 }
                 user.setUpdatedDate(LocalDate.now());
-                User response = this.userRepository.save(userDB);
-                return buildResponse(HttpStatus.OK.toString(), "User Updated");
+                User updatedUser = this.userRepository.save(userDB);
+                UserResponse userResponse = buildResponse1(updatedUser,HttpStatus.OK.toString(), "User Updated");
+                return new ResponseEntity<>(userResponse,HttpStatus.OK);
             }
         }
-
     }
     @Override
-    public Response deleteAll() throws UserNotFoundException {
+    public ResponseEntity<UserResponse> deleteAll() {
         if(this.userRepository.findAll().isEmpty()){
-            throw new UserNotFoundException("There are no registered users");
+            UserResponse userResponse =buildResponse1(null,HttpStatus.BAD_REQUEST.toString(),"There are no registered users" );
+            return new ResponseEntity<>(userResponse,HttpStatus.BAD_REQUEST);
         }
         else {
             this.userRepository.deleteAll();
-            return buildResponse(HttpStatus.OK.toString(), "Successfully deleted all users");
+            UserResponse userResponse = buildResponse1(null, HttpStatus.OK.toString(), "Successfully deleted all users");
+            return new ResponseEntity<>(userResponse,HttpStatus.OK);
         }
     }
-
     @Override
-    public Response deleteUserById(int id) {
+    public ResponseEntity<UserResponse> deleteUserById(int id) {
         if(!userRepository.findById(id).isPresent()) {
-            return buildResponse(HttpStatus.BAD_REQUEST.toString(), "User with id "+id+" is not present");
+            UserResponse userResponse = buildResponse1(null, HttpStatus.BAD_GATEWAY.toString(), "User with id " + id + " is not present");
+            return new ResponseEntity<>(userResponse, HttpStatus.BAD_REQUEST);
         }
         else{
             this.userRepository.deleteById(id);
-            return buildResponse(HttpStatus.OK.toString(), "User Deleted");
+            UserResponse userResponse =buildResponse1(null,HttpStatus.OK.toString(),"User Deleted");
+            return new ResponseEntity<>(userResponse,HttpStatus.OK);
         }
-
     }
 }

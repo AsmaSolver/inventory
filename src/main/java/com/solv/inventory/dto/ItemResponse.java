@@ -1,18 +1,19 @@
 package com.solv.inventory.dto;
 
-import com.solv.inventory.entity.Item;
-import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 
-import java.util.List;
-
-@Builder
 @Data
+@Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
 @AllArgsConstructor
-@NoArgsConstructor
 public class ItemResponse {
-    List<Item> itemList;
-    int pageNumber;
-    int pageSize;
-    int totalPage;
-    boolean isLastPage;
+    @JsonProperty("status-code")
+    private String statusCode;
+
+    @JsonProperty("status-message")
+    private String statusMessage;
 }

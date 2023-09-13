@@ -10,7 +10,10 @@ import lombok.Data;
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 @AllArgsConstructor
-public class Response {
+public class UserResponse {
+
+    @JsonProperty("data")
+    Object data;
 
     @JsonProperty("status-code")
     private String statusCode;

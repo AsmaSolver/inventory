@@ -1,5 +1,6 @@
 package com.solv.inventory.advice;
 import com.solv.inventory.exceptions.BadArgumentException;
+import com.solv.inventory.exceptions.ItemNotFoundException;
 import com.solv.inventory.exceptions.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +35,12 @@ public class GlobalExceptionHandler {
         Map<String,String> response=new HashMap<>();
         response.put("Error",ex.getMessage());
         return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(ItemNotFoundException.class)
+    public ResponseEntity<Map<String,String>> handleItemNotFoundException(ItemNotFoundException exception){
+        Map<String,String> response=new HashMap<>();
+        response.put("Error", "No item exists");
+        return new ResponseEntity<>(response,HttpStatus.NOT_FOUND);
     }
     @ExceptionHandler(Exception.class)
     public ResponseEntity<StringBuilder> handleGlobalException(Exception ex)
