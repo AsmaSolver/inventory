@@ -2,16 +2,14 @@ package com.solv.inventory.controller;
 
 import com.solv.inventory.dto.ItemDto;
 import com.solv.inventory.dto.ItemResponse;
-import com.solv.inventory.dto.ItemResponsePage;
-import com.solv.inventory.entity.Item;
 import com.solv.inventory.exceptions.ItemNotFoundException;
-import com.solv.inventory.service.ItemServiceImpl;
+import com.solv.inventory.service.impl.ItemServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
 @Api(value = "Services for items")
 @RestController
@@ -22,53 +20,59 @@ public class ItemController {
     ItemServiceImpl itemserviceimpl;
     @ApiOperation("-adds an item")
     @PostMapping("/")
-    public ItemResponse addItem(ItemDto itemDto) {
+    public ResponseEntity<ItemResponse> addItem(ItemDto itemDto) {
+
         return this.itemserviceimpl.add(itemDto);
     }
 
     @ApiOperation("gives all items")
     @GetMapping("/items")
-    public ItemResponsePage getItems(@RequestParam(value = "pageNumber", defaultValue = "0", required = false) int pageNumber,
-                                     @RequestParam(value = "pageSize", defaultValue = "5", required = false) int pageSize) throws ItemNotFoundException {
+    public ResponseEntity<ItemResponse> getItems(@RequestParam(value = "pageNumber", defaultValue = "0", required = false) int pageNumber,
+                                                 @RequestParam(value = "pageSize", defaultValue = "5", required = false) int pageSize) {
         return this.itemserviceimpl.getAllItems(pageNumber, pageSize);
     }
 
     @ApiOperation("-return list of items having name that contains tile")
     @GetMapping("/items/{title}")
-    public ItemResponsePage searchItem(@PathVariable("title") String title,
-                                       @RequestParam(name = "pageNumber",defaultValue = "0",required = false)int pageNumber,
-                                       @RequestParam(name = "pageSize",defaultValue = "5",required = false)int pageSize) throws ItemNotFoundException {
+    public ResponseEntity<ItemResponse> searchItem(@PathVariable("title") String title,
+                                                   @RequestParam(name = "pageNumber",defaultValue = "0",required = false)int pageNumber,
+                                                   @RequestParam(name = "pageSize",defaultValue = "5",required = false)int pageSize){
         return this.itemserviceimpl.searchItems(title,pageNumber,pageSize);
     }
 
     @ApiOperation("-returns the list of items in a sorted order based on given category")
     @GetMapping("/items/order")
-    public ItemResponsePage getItems(@RequestParam(name = "pageNumber", defaultValue = "0", required = false) int pageNumber,
-                                     @RequestParam(name = "pageSize",defaultValue = "2",required = false)int pageSize,
-                                     @RequestParam(name = "sortBy",defaultValue = "id",required = false)String sortBy,
-                                     @RequestParam(name = "order",defaultValue = "asc",required = false)String order) {
+    public ResponseEntity<ItemResponse> getItems(@RequestParam(name = "pageNumber", defaultValue = "0", required = false) int pageNumber,
+                                                 @RequestParam(name = "pageSize",defaultValue = "2",required = false)int pageSize,
+                                                 @RequestParam(name = "sortBy",defaultValue = "id",required = false)String sortBy,
+                                                 @RequestParam(name = "order",defaultValue = "asc",required = false)String order) {
          return this.itemserviceimpl.getItemsInOrder(pageNumber,pageSize,sortBy,order);
     }
     @ApiOperation("-returns all items which lies in a particular price range")
     @GetMapping("/items/price")
-    public List<Item> getItemBasedOnPrice(@RequestParam(name = "minPrice",defaultValue = "0.0",required = false)double minPrice,
-                                            @RequestParam(name = "maxPrice",defaultValue = "Double.MAX_VALUE",required = false)double maxPrice) throws ItemNotFoundException {
+    public ResponseEntity<ItemResponse> getItemBasedOnPrice(@RequestParam(name = "minPrice",defaultValue = "0.0",required = false)double minPrice,
+                                                            @RequestParam(name = "maxPrice",defaultValue = "Double.MAX_VALUE",required = false)double maxPrice) throws ItemNotFoundException {
         return this.itemserviceimpl.getItemsInPriceRange(minPrice,maxPrice);
     }
     @ApiOperation("-return all items which belongs to a given category")
     @GetMapping("items/category/{category}")
-    public ItemResponsePage getItemsBasedOnCategory(@PathVariable("category")String category,
-                                                    @RequestParam(value = "pageNumber",defaultValue = "0",required = false)int pageNumber,
-                                                    @RequestParam(value = "pageSize",defaultValue = "5",required = false)int pageSize) throws ItemNotFoundException {
+    public ResponseEntity<ItemResponse> getItemsBasedOnCategory(@PathVariable("category")String category,
+                                                                @RequestParam(value = "pageNumber",defaultValue = "0",required = false)int pageNumber,
+                                                                @RequestParam(value = "pageSize",defaultValue = "5",required = false)int pageSize) throws ItemNotFoundException {
         return this.itemserviceimpl.getItemsOfCategory(category,pageNumber,pageSize);
     }
     @ApiOperation("-return all items based of particular category which lies in the given price range")
     @GetMapping("items/filter/{category}")
-    public List<Item> getItemBasedOnCategoryAndPrice(@PathVariable("category")String category,
-                                                     @RequestParam(name = "minPrice",defaultValue = "0",required = false)double minPrice,
-                                                     @RequestParam(name = "maxPrice",defaultValue = "Double.MAX_VALUE",required = false)double maxPrice) throws ItemNotFoundException {
+    public ResponseEntity<ItemResponse> getItemBasedOnCategoryAndPrice(@PathVariable("category")String category,
+                                                                       @RequestParam(name = "minPrice",defaultValue = "0",required = false)double minPrice,
+                                                                       @RequestParam(name = "maxPrice",required = true)double maxPrice) {
         return this.itemserviceimpl.getItemsOfCategoryInPriceRange(category,minPrice,maxPrice);
 
+    }
+    @ApiOperation("-return the list of items that matches the given query")
+    @GetMapping("items/find")
+    public ResponseEntity<ItemResponse> getItemsThatMatchesQuery(@RequestParam(value = "query",required = true,defaultValue = "") String query){
+        return this.itemserviceimpl.getItemsThatMatchesQuery(query);
     }
 }
 

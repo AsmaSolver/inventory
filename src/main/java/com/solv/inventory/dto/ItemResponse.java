@@ -11,6 +11,10 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @AllArgsConstructor
 public class ItemResponse {
+
+    @JsonProperty("data")
+    Object data;
+
     @JsonProperty("status-code")
     private String statusCode;
 

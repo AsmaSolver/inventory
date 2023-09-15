@@ -16,4 +16,8 @@ public interface ItemRepository extends JpaRepository<Item,Integer> {
 
     @Query("SELECT i from Item i WHERE i.category =:category and i.price>=:minPrice and i.price<=:maxPrice")
     List<Item> findByCategoryAndPriceBetween(@Param("category") String category,@Param("minPrice") double minPrice,@Param("maxPrice") double maxPrice);
+
+    @Query("Select i from Item i WHERE i.name LIKE CONCAT('%',:query,'%')"+
+    "OR i.category LIKE CONCAT('%',:query,'%')")
+    List<Item> findItemBasedOnQuery(@Param("query") String query);
 }

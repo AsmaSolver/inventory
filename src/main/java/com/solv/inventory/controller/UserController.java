@@ -1,7 +1,7 @@
 package com.solv.inventory.controller;
 import com.solv.inventory.dto.RegisterUserDto;
 import com.solv.inventory.dto.UserResponse;
-import com.solv.inventory.service.UserServiceImpl;
+import com.solv.inventory.service.impl.UserServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

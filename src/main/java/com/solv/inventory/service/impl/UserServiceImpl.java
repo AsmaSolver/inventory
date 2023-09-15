@@ -1,10 +1,11 @@
-package com.solv.inventory.service;
+package com.solv.inventory.service.impl;
 
 import com.solv.inventory.dto.UserResponse;
 import com.solv.inventory.exceptions.BadArgumentException;
 import com.solv.inventory.dao.UserRepository;
 import com.solv.inventory.dto.RegisterUserDto;
 import com.solv.inventory.entity.User;
+import com.solv.inventory.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;

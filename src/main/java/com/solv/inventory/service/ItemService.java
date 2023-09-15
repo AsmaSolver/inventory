@@ -2,23 +2,23 @@ package com.solv.inventory.service;
 
 import com.solv.inventory.dto.ItemDto;
 import com.solv.inventory.dto.ItemResponse;
-import com.solv.inventory.dto.ItemResponsePage;
-import com.solv.inventory.entity.Item;
 import com.solv.inventory.exceptions.ItemNotFoundException;
-
-import java.util.List;
+import org.springframework.http.ResponseEntity;
 
 public interface ItemService {
-    ItemResponse add(ItemDto itemDto);
+    ResponseEntity<ItemResponse> add(ItemDto itemDto);
 
-    ItemResponsePage getAllItems(int pageNumber, int pageSize) throws ItemNotFoundException;
+    ResponseEntity<ItemResponse> getAllItems(int pageNumber, int pageSize);
 
-    ItemResponsePage searchItems(String value, int pageNumber, int pageSize) throws ItemNotFoundException;
+    ResponseEntity<ItemResponse> searchItems(String value, int pageNumber, int pageSize);
 
-    ItemResponsePage getItemsInOrder(int pageNumber, int pageSize, String sortBy, String order);
+    ResponseEntity<ItemResponse> getItemsInOrder(int pageNumber, int pageSize, String sortBy, String order);
 
-    List<Item> getItemsInPriceRange(double minPrice,double maxPrice) throws ItemNotFoundException;
-    ItemResponsePage getItemsOfCategory(String category, int pageNumber, int pageSize) throws ItemNotFoundException;
+    ResponseEntity<ItemResponse> getItemsInPriceRange(double minPrice, double maxPrice) throws ItemNotFoundException;
+    ResponseEntity<ItemResponse> getItemsOfCategory(String category, int pageNumber, int pageSize) throws ItemNotFoundException;
 
-    List<Item> getItemsOfCategoryInPriceRange(String category,double minPrice,double maxPrice) throws ItemNotFoundException;
+    ResponseEntity<ItemResponse> getItemsOfCategoryInPriceRange(String category, double minPrice, double maxPrice);
+
+    ResponseEntity<ItemResponse> getItemsThatMatchesQuery(String query);
+
 }

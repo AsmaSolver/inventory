@@ -2,6 +2,7 @@ package com.solv.inventory.service;
 
 import com.solv.inventory.dao.UserRepository;
 import com.solv.inventory.entity.User;
+import com.solv.inventory.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,10 +11,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import static com.solv.inventory.mapper.UserMapper.toUserDto;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
@@ -43,7 +46,12 @@ class UserServiceImplTest {
     @Test
     void getById() {
         given(userRepository.findById(1)).willReturn(Optional.ofNullable(user));
-        assertThat(((User)(userServiceImpl.getById(1).getBody()).getData())).isEqualTo(user);
+        assertThat(((User)(Objects.requireNonNull(userServiceImpl.getById(1).getBody())).getData())).isEqualTo(user);
+    }
+    @Test
+    void getByIdWhenIdDoesNotExists() {
+       userServiceImpl.getById(-1);
+       verify(userRepository).findById(-1);
     }
     @Test
     void getAll() {
@@ -61,7 +69,6 @@ class UserServiceImplTest {
         assertThat(usersList).isNotNull();
         assertThat(usersList.size()).isEqualTo(2);
     }
-
     @Test
     void updateById() {
         given(userRepository.save(user)).willReturn(user);
@@ -72,11 +79,4 @@ class UserServiceImplTest {
         assertThat(updatedUser.getName()).isEqualTo("Ram");
     }
 
-    @Test
-    void deleteAll() {
-
-    }
-    @Test
-    void deleteUserById() {
-    }
 }
