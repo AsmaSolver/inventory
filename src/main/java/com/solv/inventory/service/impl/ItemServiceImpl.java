@@ -26,7 +26,7 @@ import static com.solv.inventory.util.NameValidator.isValidName;
 
 @Service
 public class ItemServiceImpl implements ItemService {
-    @Autowired
+//    @Autowired
     ItemRepository itemRepository;
     public ItemServiceImpl(ItemRepository itemRepository){
         this.itemRepository=itemRepository;
@@ -159,7 +159,6 @@ public class ItemServiceImpl implements ItemService {
             return new ResponseEntity<>(itemResponse,HttpStatus.OK);
         }
     }
-
     private ItemResponsePage buildResponse(Page<Item> pageList){
         return ItemResponsePage.builder()
                 .itemList(pageList.toList())
