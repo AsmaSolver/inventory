@@ -26,11 +26,9 @@ import static com.solv.inventory.util.NameValidator.isValidName;
 
 @Service
 public class ItemServiceImpl implements ItemService {
-//    @Autowired
+    @Autowired
     ItemRepository itemRepository;
-    public ItemServiceImpl(ItemRepository itemRepository){
-        this.itemRepository=itemRepository;
-    }
+
     @Override
     public ResponseEntity<ItemResponse> add(ItemDto itemDto) {
         if(!isValidItem(itemDto)) {
@@ -100,13 +98,19 @@ public class ItemServiceImpl implements ItemService {
         Sort sort= Objects.equals(order, "asc") ?Sort.by(sortBy).ascending():Sort.by(sortBy).descending();
         PageRequest p=PageRequest.of(pageNumber,pageSize,sort);
         Page<Item> page= this.itemRepository.findAll(p);
-        ItemResponse itemResponse =itemResponseBuilder1(page,HttpStatus.OK.toString(),"Accepted");
-        return new ResponseEntity<>(itemResponse,HttpStatus.OK);
+        if(page.toList().isEmpty()){
+            ItemResponse itemResponse=itemResponseBuilder1(page,HttpStatus.BAD_REQUEST.toString(), "Currently there are no items");
+            return new ResponseEntity<>(itemResponse,HttpStatus.BAD_REQUEST);
+        }
+        else {
+            ItemResponse itemResponse = itemResponseBuilder1(page, HttpStatus.OK.toString(), "Accepted");
+            return new ResponseEntity<>(itemResponse, HttpStatus.OK);
+        }
 
     }
 
     @Override
-    public ResponseEntity<ItemResponse> getItemsInPriceRange(double minPrice, double maxPrice) throws ItemNotFoundException {
+    public ResponseEntity<ItemResponse> getItemsInPriceRange(double minPrice, double maxPrice) {
        List<Item> list= this.itemRepository.findByPriceBetween(minPrice,maxPrice);
        if(list.isEmpty()){
            ItemResponse itemResponse =itemResponseBuilder1(null,HttpStatus.OK.toString(),"Currently there are no items");
@@ -115,12 +119,11 @@ public class ItemServiceImpl implements ItemService {
        else {
            ItemResponse itemResponse =itemResponseBuilder1(list,HttpStatus.OK.toString(), "Accepted");
            return new ResponseEntity<>(itemResponse,HttpStatus.OK);
-
        }
     }
 
     @Override
-    public ResponseEntity<ItemResponse> getItemsOfCategory(String category, int pageNumber, int pageSize) throws ItemNotFoundException {
+    public ResponseEntity<ItemResponse> getItemsOfCategory(String category, int pageNumber, int pageSize) {
         PageRequest p=PageRequest.of(pageNumber,pageSize);
         Page<Item> page= this.itemRepository.findByCategory(category,p);
         if(page.toList().isEmpty()){
@@ -151,7 +154,7 @@ public class ItemServiceImpl implements ItemService {
     public ResponseEntity<ItemResponse> getItemsThatMatchesQuery(String query) {
         List<Item> list=this.itemRepository.findItemBasedOnQuery(query);
         if(list.isEmpty()){
-            ItemResponse itemResponse=itemResponseBuilder1(null,HttpStatus.BAD_GATEWAY.toString(), "No items present");
+            ItemResponse itemResponse=itemResponseBuilder1(null,HttpStatus.BAD_REQUEST.toString(), "No items present");
             return new ResponseEntity<>(itemResponse,HttpStatus.BAD_REQUEST);
         }
         else{
@@ -159,6 +162,20 @@ public class ItemServiceImpl implements ItemService {
             return new ResponseEntity<>(itemResponse,HttpStatus.OK);
         }
     }
+
+    @Override
+    public ResponseEntity<ItemResponse> searchDefault(String category, double minPrice, double maxPrice) {
+        List<Item> itemList =this.itemRepository.findItemsBasedOnParameters(category,minPrice,maxPrice);
+        if(itemList.isEmpty()){
+            ItemResponse itemResponse=itemResponseBuilder1(null,HttpStatus.BAD_REQUEST.toString(), "No items present");
+            return new ResponseEntity<>(itemResponse,HttpStatus.BAD_REQUEST);
+        }
+        else{
+            ItemResponse itemResponse=itemResponseBuilder1(itemList,HttpStatus.OK.toString(),"Accepted");
+            return new ResponseEntity<>(itemResponse,HttpStatus.OK);
+        }
+    }
+
     private ItemResponsePage buildResponse(Page<Item> pageList){
         return ItemResponsePage.builder()
                 .itemList(pageList.toList())

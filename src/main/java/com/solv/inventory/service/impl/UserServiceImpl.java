@@ -6,6 +6,7 @@ import com.solv.inventory.dao.UserRepository;
 import com.solv.inventory.dto.RegisterUserDto;
 import com.solv.inventory.entity.User;
 import com.solv.inventory.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -22,12 +23,8 @@ import static com.solv.inventory.util.UserTypeValidator.isValidUserType;
 @Service
 public class UserServiceImpl implements UserService {
 
-//    @Autowired
+    @Autowired
     UserRepository userRepository;
-
-    public UserServiceImpl(UserRepository userRepository) {
-        this.userRepository=userRepository;
-    }
 
     @Override
     public String saveUser(String userName) {
@@ -46,7 +43,7 @@ public class UserServiceImpl implements UserService {
             user.setUpdatedDate(LocalDate.now());
             user = userRepository.save(user);
            UserResponse userResponse =buildResponse1(user,HttpStatus.CREATED.toString(), "User registered successfully");
-           return new ResponseEntity<>(userResponse,HttpStatus.BAD_REQUEST);
+           return new ResponseEntity<>(userResponse,HttpStatus.OK);
        }
     }
     private UserResponse buildResponse1(Object object, String statusCode, String message){
@@ -90,7 +87,7 @@ public class UserServiceImpl implements UserService {
         }
         else {
             List<RegisterUserDto> list=toUserDtoList(userList);
-            UserResponse userResponse =buildResponse1(list,HttpStatus.OK.toString(), "Currently there are no registered users");
+            UserResponse userResponse =buildResponse1(list,HttpStatus.OK.toString(), "Accepted");
             return new ResponseEntity<>(userResponse,HttpStatus.OK);
         }
     }

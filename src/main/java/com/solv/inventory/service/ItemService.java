@@ -14,11 +14,13 @@ public interface ItemService {
 
     ResponseEntity<ItemResponse> getItemsInOrder(int pageNumber, int pageSize, String sortBy, String order);
 
-    ResponseEntity<ItemResponse> getItemsInPriceRange(double minPrice, double maxPrice) throws ItemNotFoundException;
-    ResponseEntity<ItemResponse> getItemsOfCategory(String category, int pageNumber, int pageSize) throws ItemNotFoundException;
+    ResponseEntity<ItemResponse> getItemsInPriceRange(double minPrice, double maxPrice) ;
+    ResponseEntity<ItemResponse> getItemsOfCategory(String category, int pageNumber, int pageSize);
 
     ResponseEntity<ItemResponse> getItemsOfCategoryInPriceRange(String category, double minPrice, double maxPrice);
 
     ResponseEntity<ItemResponse> getItemsThatMatchesQuery(String query);
+
+    ResponseEntity<ItemResponse> searchDefault(String category,double minPrice,double maxPrice);
 
 }
