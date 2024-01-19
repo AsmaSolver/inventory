@@ -1,4 +1,5 @@
 package com.solv.inventory.advice;
+
 import com.solv.inventory.exceptions.BadArgumentException;
 import com.solv.inventory.exceptions.ItemNotFoundException;
 import com.solv.inventory.exceptions.UserNotFoundException;
@@ -23,6 +24,7 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
+
     @ExceptionHandler(BadArgumentException.class)
     public ResponseEntity<Map<String,String>> handleBadArgumentException(BadArgumentException ex)
     {

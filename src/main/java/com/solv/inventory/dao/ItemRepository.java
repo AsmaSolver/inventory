@@ -14,14 +14,16 @@ public interface ItemRepository extends JpaRepository<Item,Integer> {
 
     Page<Item> findByCategory(String category,Pageable pageable);
 
-
-    @Query("SELECT i from Item i WHERE (i.category LIKE CONCAT('%',:category,'%') OR Coalesce(:category,'') = '') and i.price>=:minPrice and i.price<=:maxPrice")
-    List<Item> findByCategoryAndPriceBetween(@Param("category") String category,@Param("minPrice") double minPrice,@Param("maxPrice") double maxPrice);
+    @Query("SELECT i from Item i WHERE (i.category LIKE CONCAT('%',:category,'%') OR Coalesce(:category,'') = '')" +
+            " and i.price>=:minPrice and i.price<=:maxPrice")
+    List<Item> findByCategoryAndPriceBetween(@Param("category") String category,@Param("minPrice") double minPrice,
+                                             @Param("maxPrice") double maxPrice);
 
     @Query("Select i from Item i WHERE i.name LIKE CONCAT('%',:query,'%')"+
     "OR i.category LIKE CONCAT('%',:query,'%')")
     List<Item> findItemBasedOnQuery(@Param("query") String query);
 
     @Query("SELECT i from Item i WHERE i.category LIKE CONCAT ('%'=:category,'%') and i.price>=:minPrice and i.price<=:maxPrice")
-    List<Item> findItemsBasedOnParameters(@Param("category")String category,@Param("minPrice")double minPrice,@Param("maxPrice")double maxPrice);
+    List<Item> findItemsBasedOnParameters(@Param("category")String category,@Param("minPrice")double minPrice,
+                                          @Param("maxPrice")double maxPrice);
 }

@@ -33,8 +33,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<UserResponse> createNewUser(RegisterUserDto registerUserDto) {
-       if(!isValidUser(registerUserDto)) {
-           UserResponse userResponse =buildResponse1(null,HttpStatus.BAD_REQUEST.toString(),"Invalid Inputs");
+       if(isInvalidUser(registerUserDto)) {
+           UserResponse userResponse =buildResponse1(null,HttpStatus.BAD_REQUEST.value()
+                   ,"Invalid Inputs");
            return new ResponseEntity<>(userResponse,HttpStatus.BAD_REQUEST);
        }
         else{
@@ -42,39 +43,42 @@ public class UserServiceImpl implements UserService {
             user.setCreatedDate(LocalDate.now());
             user.setUpdatedDate(LocalDate.now());
             user = userRepository.save(user);
-           UserResponse userResponse =buildResponse1(user,HttpStatus.CREATED.toString(), "User registered successfully");
+           UserResponse userResponse =buildResponse1(user,HttpStatus.CREATED.value()
+                   , "User registered successfully");
            return new ResponseEntity<>(userResponse,HttpStatus.OK);
        }
     }
-    private UserResponse buildResponse1(Object object, String statusCode, String message){
+    private UserResponse buildResponse1(Object object, int statusCode, String message){
         return UserResponse.builder()
                 .data(object)
                 .statusCode(statusCode)
                 .statusMessage(message)
                 .build();
     }
-    private boolean isValidUser(RegisterUserDto registerUserDto)  {
+    private boolean isInvalidUser(RegisterUserDto registerUserDto)  {
         try{
             isValidName(registerUserDto.getName());
             isValidMobileNumber(registerUserDto.getMobNum());
             isValidEmail(registerUserDto.getEmail());
             isValidUserType(registerUserDto.getUserType());
-            return true;
+            return false;
         }
         catch(BadArgumentException ignored){
 
         }
-        return false;
+        return true;
     }
     @Override
     public ResponseEntity<UserResponse> getById(int id) {
         if(!userRepository.findById(id).isPresent()) {
-            UserResponse userResponse = buildResponse1(null, HttpStatus.BAD_REQUEST.toString(), "User with id " + id + " does not exists");
+            UserResponse userResponse = buildResponse1(null, HttpStatus.BAD_REQUEST.value()
+                    , "User with id " + id + " does not exists");
             return new ResponseEntity<>(userResponse,HttpStatus.BAD_REQUEST);
         }
         else {
             User user = userRepository.findById(id).get();
-            UserResponse userResponse = buildResponse1(user, HttpStatus.OK.toString(), "User with given id exists");
+            UserResponse userResponse = buildResponse1(user, HttpStatus.OK.value()
+                    , "User with given id exists");
             return new ResponseEntity<>(userResponse,HttpStatus.OK);
         }
     }
@@ -82,20 +86,22 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<UserResponse>getAll()  {
         List<User> userList=this.userRepository.findAll();
         if(userList.isEmpty()) {
-            UserResponse userResponse = buildResponse1(null, HttpStatus.OK.toString(), "Currently there are no registered users");
+            UserResponse userResponse = buildResponse1(null, HttpStatus.OK.value()
+                    , "Currently there are no registered users");
             return new ResponseEntity<>(userResponse,HttpStatus.OK);
         }
         else {
             List<RegisterUserDto> list=toUserDtoList(userList);
-            UserResponse userResponse =buildResponse1(list,HttpStatus.OK.toString(), "Accepted");
+            UserResponse userResponse =buildResponse1(list,HttpStatus.OK.value(), "Accepted");
             return new ResponseEntity<>(userResponse,HttpStatus.OK);
         }
     }
 
     @Override
     public ResponseEntity<UserResponse> updateById(RegisterUserDto registerUserDto, int id) {
-        if(!isValidUser(registerUserDto)){
-            UserResponse userResponse = buildResponse1(null,HttpStatus.BAD_REQUEST.toString(), "Invalid Fields");
+        if(isInvalidUser(registerUserDto)){
+            UserResponse userResponse = buildResponse1(null,HttpStatus.BAD_REQUEST.value()
+                    , "Invalid Fields");
             return new ResponseEntity<>(userResponse,HttpStatus.BAD_REQUEST);
         }
         else{
@@ -104,7 +110,7 @@ public class UserServiceImpl implements UserService {
                 user.setCreatedDate(LocalDate.now());
                 user.setUpdatedDate(LocalDate.now());
                 User updatedUser= this.userRepository.save(user);
-                UserResponse userResponse = buildResponse1(updatedUser,HttpStatus.OK.toString(), "User Created");
+                UserResponse userResponse = buildResponse1(updatedUser,HttpStatus.OK.value(), "User Created");
                 return new ResponseEntity<>(userResponse,HttpStatus.CREATED);
 
             }
@@ -125,7 +131,7 @@ public class UserServiceImpl implements UserService {
                 }
                 user.setUpdatedDate(LocalDate.now());
                 User updatedUser = this.userRepository.save(userDB);
-                UserResponse userResponse = buildResponse1(updatedUser,HttpStatus.OK.toString(), "User Updated");
+                UserResponse userResponse = buildResponse1(updatedUser,HttpStatus.OK.value(), "User Updated");
                 return new ResponseEntity<>(userResponse,HttpStatus.OK);
             }
         }
@@ -133,24 +139,27 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<UserResponse> deleteAll() {
         if(this.userRepository.findAll().isEmpty()){
-            UserResponse userResponse =buildResponse1(null,HttpStatus.BAD_REQUEST.toString(),"There are no registered users" );
+            UserResponse userResponse =buildResponse1(null,HttpStatus.BAD_REQUEST.value()
+                    ,"There are no registered users" );
             return new ResponseEntity<>(userResponse,HttpStatus.BAD_REQUEST);
         }
         else {
             this.userRepository.deleteAll();
-            UserResponse userResponse = buildResponse1(null, HttpStatus.OK.toString(), "Successfully deleted all users");
+            UserResponse userResponse = buildResponse1(null, HttpStatus.OK.value()
+                    , "Successfully deleted all users");
             return new ResponseEntity<>(userResponse,HttpStatus.OK);
         }
     }
     @Override
     public ResponseEntity<UserResponse> deleteUserById(int id) {
         if(!userRepository.findById(id).isPresent()) {
-            UserResponse userResponse = buildResponse1(null, HttpStatus.BAD_GATEWAY.toString(), "User with id " + id + " is not present");
+            UserResponse userResponse = buildResponse1(null, HttpStatus.BAD_GATEWAY.value()
+                    , "User with id " + id + " is not present");
             return new ResponseEntity<>(userResponse, HttpStatus.BAD_REQUEST);
         }
         else{
             this.userRepository.deleteById(id);
-            UserResponse userResponse =buildResponse1(null,HttpStatus.OK.toString(),"User Deleted");
+            UserResponse userResponse =buildResponse1(null,HttpStatus.OK.value(),"User Deleted");
             return new ResponseEntity<>(userResponse,HttpStatus.OK);
         }
     }

@@ -16,7 +16,7 @@ public class UserResponse {
     Object data;
 
     @JsonProperty("status-code")
-    private String statusCode;
+    private int statusCode;
 
     @JsonProperty("status-message")
     private String statusMessage;

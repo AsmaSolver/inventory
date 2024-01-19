@@ -2,7 +2,6 @@ package com.solv.inventory.controller;
 
 import com.solv.inventory.dto.ItemDto;
 import com.solv.inventory.dto.ItemResponse;
-import com.solv.inventory.exceptions.ItemNotFoundException;
 import com.solv.inventory.service.impl.ItemServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -49,27 +48,36 @@ public class ItemController {
     }
     @ApiOperation("-returns all items which lies in a particular price range")
     @GetMapping("/items/price")
-    public ResponseEntity<ItemResponse> getItemBasedOnPrice(@RequestParam(name = "minPrice",defaultValue = "0.0",required = false)double minPrice,
-                                                            @RequestParam(name = "maxPrice",defaultValue = "100000000000.0",required = false)double maxPrice) throws ItemNotFoundException {
+    public ResponseEntity<ItemResponse> getItemBasedOnPrice(@RequestParam(name = "minPrice",defaultValue = "0.0",
+                                                                    required = false)double minPrice,
+                                                            @RequestParam(name = "maxPrice",defaultValue = "100000000000.0",
+                                                                    required = false)double maxPrice) {
         return this.itemserviceimpl.getItemsInPriceRange(minPrice,maxPrice);
     }
     @ApiOperation("-return all items which belongs to a given category")
     @GetMapping("items/category")
-    public ResponseEntity<ItemResponse> getItemsBasedOnCategory(@RequestParam(value = "category",defaultValue = "",required = false)String category,
-                                                                @RequestParam(value = "pageNumber",defaultValue = "0",required = false)int pageNumber,
-                                                                @RequestParam(value = "pageSize",defaultValue = "5",required = false)int pageSize) throws ItemNotFoundException {
+    public ResponseEntity<ItemResponse> getItemsBasedOnCategory(@RequestParam(value = "category",defaultValue = "",
+                                                                         required = false)String category,
+                                                                @RequestParam(value = "pageNumber",defaultValue = "0",
+                                                                        required = false)int pageNumber,
+                                                                @RequestParam(value = "pageSize",defaultValue = "5",
+                                                                        required = false)int pageSize)  {
         return this.itemserviceimpl.getItemsOfCategory(category,pageNumber,pageSize);
     }
     @ApiOperation("-return all items based of particular category which lies in the given price range")
     @GetMapping("items/filter")
-    public ResponseEntity<ItemResponse> getItemBasedOnCategoryAndPrice(@RequestParam(value = "category",defaultValue = "",required = false)String category,
-                                                                       @RequestParam(name = "minPrice",defaultValue = "0",required = false)double minPrice,
-                                                                       @RequestParam(name = "maxPrice",defaultValue = "1000000000000",required = false)double maxPrice) {
+    public ResponseEntity<ItemResponse> getItemBasedOnCategoryAndPrice(@RequestParam(value = "category",defaultValue = "",
+                                                                                required = false)String category,
+                                                                       @RequestParam(name = "minPrice",defaultValue = "0",
+                                                                               required = false)double minPrice,
+                                                                       @RequestParam(name = "maxPrice",defaultValue = "1000000000000",
+                                                                               required = false)double maxPrice) {
         return this.itemserviceimpl.getItemsOfCategoryInPriceRange(category,minPrice,maxPrice);
     }
     @ApiOperation("-return the list of items that matches the given query")
     @GetMapping("items/find")
-    public ResponseEntity<ItemResponse> getItemsThatMatchesQuery(@RequestParam(value = "query",required = true,defaultValue = "") String query){
+    public ResponseEntity<ItemResponse> getItemsThatMatchesQuery(@RequestParam(value = "query",required = true,
+                                                                                defaultValue = "") String query){
         return this.itemserviceimpl.getItemsThatMatchesQuery(query);
     }
 }

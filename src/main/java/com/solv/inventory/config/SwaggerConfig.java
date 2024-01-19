@@ -14,9 +14,6 @@ public class SwaggerConfig {
     @Value("${controller.path}")
     private String path;
 
-    /**
-     * setting properties of swagger
-     */
     @Bean
     public Docket productApi() {
         return new Docket(DocumentationType.SWAGGER_2)

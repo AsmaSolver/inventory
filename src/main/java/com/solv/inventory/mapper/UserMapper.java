@@ -13,8 +13,8 @@ public class UserMapper {
         return RegisterUserDto.builder()
                 .email(user.getEmail())
                 .mobNum(user.getMobNum())
-                .name(user.getName()).
-                userType(user.getUserType())
+                .name(user.getName())
+                .userType(user.getUserType())
                 .build();
     }
     public static User toUser(RegisterUserDto registerUserDto)

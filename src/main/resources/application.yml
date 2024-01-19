@@ -1,7 +1,7 @@
 server:
   port: 2525
+  context-path: /solv
   servlet:
-    context-path: /solv
 
 gotech:
   base_url: localhost:2525
@@ -12,7 +12,7 @@ controller:
 spring:
   mvc:
     pathmatch:
-      matching-strategy: ant_path_matcher #to resolve error related to swagger
+      matching-strategy: ant_path_matcher
 
   datasource:
     url: jdbc:mysql://localhost:3306/user_inventory

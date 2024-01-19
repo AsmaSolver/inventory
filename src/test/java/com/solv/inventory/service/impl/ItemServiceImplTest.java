@@ -8,13 +8,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import static com.solv.inventory.mapper.ItemMapper.toItemDto;
+import static java.util.Objects.requireNonNull;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -32,8 +33,11 @@ class ItemServiceImplTest {
                 .category("Electronics")
                 .price(100000)
                 .build();
+
         when(itemRepository.save(item)).thenReturn(item);
+
         ResponseEntity<ItemResponse> itemResponseResponseEntity=itemServiceImpl.add(toItemDto(item));
+
         assertEquals("201 CREATED",itemResponseResponseEntity.getStatusCode().toString());
     }
     @Test
@@ -43,10 +47,14 @@ class ItemServiceImplTest {
                 .category("Electronics")
                 .price(100000)
                 .build();
+
         when(itemRepository.save(item)).thenReturn(item);
+
         ResponseEntity<ItemResponse> itemResponseResponseEntity=itemServiceImpl.add(toItemDto(item));
+
         assertEquals("400 BAD_REQUEST",itemResponseResponseEntity.getStatusCode().toString());
-        assertEquals("Enter the fields correctly", Objects.requireNonNull(itemResponseResponseEntity.getBody()).getStatusMessage());
+        assertEquals("Enter the fields correctly", requireNonNull(itemResponseResponseEntity.getBody())
+                .getStatusMessage());
     }
     @Test
     void testGetAllItemsOk() {
@@ -65,20 +73,27 @@ class ItemServiceImplTest {
         list.add(item1);
         Pageable pageable=PageRequest.of(0,10);
         Page<Item> page=new PageImpl<>(list);
+
         when(itemRepository.findAll(pageable)).thenReturn(page);
+
         ResponseEntity<ItemResponse> itemResponseResponseEntity=itemServiceImpl.getAllItems(0,10);
+
         assertEquals("200 OK",itemResponseResponseEntity.getStatusCode().toString());
-        assertEquals("Accepted", Objects.requireNonNull(itemResponseResponseEntity.getBody()).getStatusMessage());
+        assertEquals("Accepted", requireNonNull(itemResponseResponseEntity.getBody()).getStatusMessage());
     }
     @Test
     void testGetAllItemsNotOk() {
         List<Item> list=new ArrayList<>();
         Pageable pageable=PageRequest.of(0,10);
         Page<Item> page=new PageImpl<>(list);
+
         when(itemRepository.findAll(pageable)).thenReturn(page);
+
         ResponseEntity<ItemResponse> itemResponseResponseEntity=itemServiceImpl.getAllItems(0,10);
+
         assertEquals("400 BAD_REQUEST",itemResponseResponseEntity.getStatusCode().toString());
-        assertEquals("Currently there are no items", Objects.requireNonNull(itemResponseResponseEntity.getBody()).getStatusMessage());
+        assertEquals("Currently there are no items", requireNonNull(itemResponseResponseEntity
+                .getBody()).getStatusMessage());
     }
 
     @Test
@@ -92,9 +107,13 @@ class ItemServiceImplTest {
         list.add(item);
         Pageable p= PageRequest.of(0,5);
         Page<Item> page=new PageImpl<>(list);
+
         when(itemRepository.findByNameContaining("Laptop",p)).thenReturn(page);
-        ResponseEntity<ItemResponse> itemResponseResponseEntity=itemServiceImpl.searchItems("Laptop",0,5);
-        assertEquals("200 OK", Objects.requireNonNull(itemResponseResponseEntity.getBody()).getStatusCode().toString());
+
+        ResponseEntity<ItemResponse> itemResponseResponseEntity=itemServiceImpl
+                .searchItems("Laptop",0,5);
+
+        assertEquals(HttpStatus.OK,itemResponseResponseEntity.getStatusCode());
         assertEquals("Accepted",itemResponseResponseEntity.getBody().getStatusMessage());
     }
     @Test
@@ -102,9 +121,13 @@ class ItemServiceImplTest {
         List<Item> list=new ArrayList<>();
         Pageable p= PageRequest.of(0,5);
         Page<Item> page=new PageImpl<>(list);
+
         when(itemRepository.findByNameContaining("Laptop",p)).thenReturn(page);
-        ResponseEntity<ItemResponse> itemResponseResponseEntity=itemServiceImpl.searchItems("Laptop",0,5);
-        assertEquals("400 BAD_REQUEST", Objects.requireNonNull(itemResponseResponseEntity.getBody()).getStatusCode().toString());
+
+        ResponseEntity<ItemResponse> itemResponseResponseEntity=itemServiceImpl
+                .searchItems("Laptop",0,5);
+
+        assertEquals(HttpStatus.BAD_REQUEST, itemResponseResponseEntity.getStatusCode());
         assertEquals("Currently there are no items",itemResponseResponseEntity.getBody().getStatusMessage());
     }
 
@@ -126,10 +149,14 @@ class ItemServiceImplTest {
         Sort sort= Sort.by("id").ascending();
         PageRequest p=PageRequest.of(0,10,sort);
         Page<Item> page =new PageImpl<>(list);
+
         when(itemRepository.findAll(p)).thenReturn(page);
-        ResponseEntity<ItemResponse> itemResponseResponseEntity=itemServiceImpl.getItemsInOrder(0,10,"id","asc");
+
+        ResponseEntity<ItemResponse> itemResponseResponseEntity=itemServiceImpl
+                .getItemsInOrder(0,10,"id","asc");
+
         assertEquals("200 OK",itemResponseResponseEntity.getStatusCode().toString());
-        assertEquals("Accepted", Objects.requireNonNull(itemResponseResponseEntity.getBody()).getStatusMessage());
+        assertEquals("Accepted", requireNonNull(itemResponseResponseEntity.getBody()).getStatusMessage());
     }
     @Test
     void testGetItemsInOrderNotOk() {
@@ -137,10 +164,15 @@ class ItemServiceImplTest {
         Sort sort= Sort.by("id").ascending();
         PageRequest p=PageRequest.of(0,10,sort);
         Page<Item> page =new PageImpl<>(list);
+
         when(itemRepository.findAll(p)).thenReturn(page);
-        ResponseEntity<ItemResponse> itemResponseResponseEntity=itemServiceImpl.getItemsInOrder(0,10,"id","asc");
+
+        ResponseEntity<ItemResponse> itemResponseResponseEntity=itemServiceImpl
+                .getItemsInOrder(0,10,"id","asc");
+
         assertEquals("400 BAD_REQUEST",itemResponseResponseEntity.getStatusCode().toString());
-        assertEquals("Currently there are no items", Objects.requireNonNull(itemResponseResponseEntity.getBody()).getStatusMessage());
+        assertEquals("Currently there are no items", requireNonNull(itemResponseResponseEntity.getBody())
+                .getStatusMessage());
         verify(itemRepository,times(1)).findAll(p);
     }
 
@@ -158,18 +190,25 @@ class ItemServiceImplTest {
                 .build();
         List<Item> list=new ArrayList<>();
         list.add(item);
+
         when(itemRepository.findByPriceBetween(1500,100000)).thenReturn(list);
+
         ResponseEntity<ItemResponse> itemResponseResponseEntity=itemServiceImpl.getItemsInPriceRange(1500,100000);
+
         assertEquals("200 OK",itemResponseResponseEntity.getStatusCode().toString());
-        assertEquals("Accepted", Objects.requireNonNull(itemResponseResponseEntity.getBody()).getStatusMessage());
+        assertEquals("Accepted", requireNonNull(itemResponseResponseEntity.getBody()).getStatusMessage());
     }
     @Test
     void testGetItemsInPriceRangeNotOk() {
         List<Item> list=new ArrayList<>();
+
         when(itemRepository.findByPriceBetween(1500,100000)).thenReturn(list);
+
         ResponseEntity<ItemResponse> itemResponseResponseEntity=itemServiceImpl.getItemsInPriceRange(1500,100000);
+
         assertEquals("200 OK",itemResponseResponseEntity.getStatusCode().toString());
-        assertEquals("Currently there are no items", Objects.requireNonNull(itemResponseResponseEntity.getBody()).getStatusMessage());
+        assertEquals("Currently there are no items", requireNonNull(itemResponseResponseEntity
+                .getBody()).getStatusMessage());
     }
     @Test
     void testGetItemsOfCategoryOk(){
@@ -187,10 +226,14 @@ class ItemServiceImplTest {
         List<Item> list=new ArrayList<>();
         list.add(item);
         Page<Item> page=new PageImpl<>(list);
+
         when(itemRepository.findByCategory("Electronics",p)).thenReturn(page);
-        ResponseEntity<ItemResponse> itemResponseResponseEntity=itemServiceImpl.getItemsOfCategory("Electronics",0,10);
+
+        ResponseEntity<ItemResponse> itemResponseResponseEntity=itemServiceImpl
+                .getItemsOfCategory("Electronics",0,10);
+
         assertEquals("200 OK",itemResponseResponseEntity.getStatusCode().toString());
-        assertEquals("Accepted", Objects.requireNonNull(itemResponseResponseEntity.getBody()).getStatusMessage());
+        assertEquals("Accepted", requireNonNull(itemResponseResponseEntity.getBody()).getStatusMessage());
     }
     @Test
     void testGetItemsOfCategoryNotOk(){
@@ -202,10 +245,15 @@ class ItemServiceImplTest {
                 .build();
         List<Item> list=new ArrayList<>();
         Page<Item> page=new PageImpl<>(list);
+
         when(itemRepository.findByCategory("Electronics",p)).thenReturn(page);
-        ResponseEntity<ItemResponse> itemResponseResponseEntity=itemServiceImpl.getItemsOfCategory("Electronics",0,10);
+
+        ResponseEntity<ItemResponse> itemResponseResponseEntity=itemServiceImpl
+                .getItemsOfCategory("Electronics",0,10);
+
         assertEquals("200 OK",itemResponseResponseEntity.getStatusCode().toString());
-        assertEquals("Currently there are no items", Objects.requireNonNull(itemResponseResponseEntity.getBody()).getStatusMessage());
+        assertEquals("Currently there are no items", requireNonNull(itemResponseResponseEntity.getBody())
+                .getStatusMessage());
     }
     @Test
     void testGetItemsOfCategoryInPriceRangeOk() {
@@ -222,20 +270,32 @@ class ItemServiceImplTest {
                 .build();
         List<Item> list=new ArrayList<>();
         list.add(item);
-        when(itemRepository.findByCategoryAndPriceBetween("Electronics",2000,100000)).thenReturn(list);
-        ResponseEntity<ItemResponse> itemResponseResponseEntity=itemServiceImpl.getItemsOfCategoryInPriceRange("Electronics",2000,100000);
+
+        when(itemRepository.findByCategoryAndPriceBetween("Electronics",2000,100000))
+                .thenReturn(list);
+
+        ResponseEntity<ItemResponse> itemResponseResponseEntity=itemServiceImpl
+                .getItemsOfCategoryInPriceRange("Electronics",2000,100000);
+
         assertEquals("200 OK",itemResponseResponseEntity.getStatusCode().toString());
-        assertEquals("Accepted", Objects.requireNonNull(itemResponseResponseEntity.getBody()).getStatusMessage());
-        verify(itemRepository,times(1)).findByCategoryAndPriceBetween("Electronics",2000,100000);
+        assertEquals("Accepted", requireNonNull(itemResponseResponseEntity.getBody()).getStatusMessage());
+        verify(itemRepository,times(1))
+                .findByCategoryAndPriceBetween("Electronics",2000,100000);
     }
     @Test
     void testGetItemsOfCategoryInPriceRangeNotOk() {
 
         List<Item> list=new ArrayList<>();
-        when(itemRepository.findByCategoryAndPriceBetween("Electronics",2000,100000)).thenReturn(list);
-        ResponseEntity<ItemResponse> itemResponseResponseEntity=itemServiceImpl.getItemsOfCategoryInPriceRange("Electronics",2000,100000);
+        when(itemRepository.findByCategoryAndPriceBetween("Electronics",2000,100000))
+                .thenReturn(list);
+
+        ResponseEntity<ItemResponse> itemResponseResponseEntity=itemServiceImpl
+                .getItemsOfCategoryInPriceRange("Electronics",2000,100000);
+
         assertEquals("200 OK",itemResponseResponseEntity.getStatusCode().toString());
-        assertEquals("Currently there are no items", Objects.requireNonNull(itemResponseResponseEntity.getBody()).getStatusMessage());
-        verify(itemRepository,times(1)).findByCategoryAndPriceBetween("Electronics",2000,100000);
+        assertEquals("Currently there are no items", requireNonNull(itemResponseResponseEntity.getBody())
+                .getStatusMessage());
+        verify(itemRepository,times(1))
+                .findByCategoryAndPriceBetween("Electronics",2000,100000);
     }
 }

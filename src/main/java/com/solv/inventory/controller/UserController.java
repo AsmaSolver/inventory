@@ -34,7 +34,8 @@ public class UserController {
     }
     @ApiOperation("-update an existing user")
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponse> updateUser(@RequestBody RegisterUserDto registerUserDto, @PathVariable("id") int id){
+    public ResponseEntity<UserResponse> updateUser(@RequestBody RegisterUserDto registerUserDto,
+                                                   @PathVariable("id") int id){
         return this.userServiceImpl.updateById(registerUserDto,id);
     }
     @ApiOperation("-deletes all the existing users")
