@@ -1,6 +1,7 @@
 package com.solv.inventory.controller;
 
 import com.solv.inventory.dto.ItemDto;
+import com.solv.inventory.dto.ItemRequestFilterDto;
 import com.solv.inventory.dto.ItemResponse;
 import com.solv.inventory.service.impl.ItemServiceImpl;
 import io.swagger.annotations.Api;
@@ -79,6 +80,11 @@ public class ItemController {
     public ResponseEntity<ItemResponse> getItemsThatMatchesQuery(@RequestParam(value = "query",required = true,
                                                                                 defaultValue = "") String query){
         return this.itemserviceimpl.getItemsThatMatchesQuery(query);
+    }
+
+    @PostMapping("items/specific")
+    public  ResponseEntity<ItemResponse> getAllItemsBasedOnSpecification(@RequestBody ItemRequestFilterDto requestFilterDto){
+       return this.itemserviceimpl.getAllBasedOnSpecification(requestFilterDto);
     }
 }
 

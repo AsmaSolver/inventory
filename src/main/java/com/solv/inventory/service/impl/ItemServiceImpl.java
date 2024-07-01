@@ -2,6 +2,7 @@ package com.solv.inventory.service.impl;
 
 import com.solv.inventory.dao.ItemRepository;
 import com.solv.inventory.dto.ItemDto;
+import com.solv.inventory.dto.ItemRequestFilterDto;
 import com.solv.inventory.dto.ItemResponse;
 import com.solv.inventory.dto.ItemResponsePage;
 import com.solv.inventory.entity.Item;
@@ -13,9 +14,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import static com.solv.inventory.mapper.ItemMapper.toItemDto;
@@ -149,7 +157,6 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ResponseEntity<ItemResponse> getItemsOfCategoryInPriceRange(String category, double minPrice, double maxPrice){
         List<Item> list= this.itemRepository.findByCategoryAndPriceBetween(category,minPrice,maxPrice);
-
         if(list.isEmpty()){
             ItemResponse itemResponse =itemResponseBuilder1(null,HttpStatus.OK.value()
                     ,"Currently there are no items");
@@ -189,6 +196,44 @@ public class ItemServiceImpl implements ItemService {
             ItemResponse itemResponse=itemResponseBuilder1(itemList,HttpStatus.OK.value(),"Accepted");
             return new ResponseEntity<>(itemResponse,HttpStatus.OK);
         }
+    }
+    public ResponseEntity<ItemResponse> getAllBasedOnSpecification(ItemRequestFilterDto itemRequestFilterDto){
+
+        Specification<Item> byFilters = findByFilters(itemRequestFilterDto);
+        List<Item> itemList = itemRepository.findAll(byFilters);
+        if(itemList.isEmpty()){
+            ItemResponse itemResponse=itemResponseBuilder1(null,HttpStatus.BAD_REQUEST.value()
+                    , "No items present");
+            return new ResponseEntity<>(itemResponse,HttpStatus.BAD_REQUEST);
+        }
+        else{
+            ItemResponse itemResponse=itemResponseBuilder1(itemList,HttpStatus.OK.value(),"Following Items");
+            return new ResponseEntity<>(itemResponse,HttpStatus.OK);
+        }
+
+
+    }
+
+    private Specification<Item> findByFilters(ItemRequestFilterDto itemRequestFilterDto) {
+        Specification<Item> specification = new Specification<Item>() {
+            @Override
+            public Predicate toPredicate(Root<Item> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+                List<Predicate> predicates = new ArrayList<>();
+                if(!itemRequestFilterDto.getCategory().isEmpty()){
+                    Predicate equal = criteriaBuilder.equal(root.get("category"), itemRequestFilterDto.getCategory());
+                    predicates.add(equal);
+                }
+                if(!itemRequestFilterDto.getName().isEmpty()){
+                    predicates.add(criteriaBuilder.equal(root.get("name"),itemRequestFilterDto.getName()));
+                }
+
+                predicates.add(criteriaBuilder.greaterThan(root.get("price"),itemRequestFilterDto.getPrice()));
+
+                return criteriaBuilder.or(predicates.toArray(new Predicate[0]));
+
+            }
+        };
+        return specification;
     }
 
     private ItemResponsePage buildResponse(Page<Item> pageList){
